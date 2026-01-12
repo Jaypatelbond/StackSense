@@ -2,9 +2,10 @@
 
 <div align="center">
 
-![StackSense Logo](docs/logo.png)
+<img src="docs/logo.png" width="120" alt="StackSense Logo" />
 
 **Analyze installed Android apps to discover their programming languages, cross-platform frameworks, and third-party libraries.**
+*Reverse-engineer your app ecosystem. 100% Offline.*
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2024.12-4285F4?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
