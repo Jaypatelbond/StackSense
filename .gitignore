@@ -1,0 +1,55 @@
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file
+local.properties
+
+# IntelliJ
+*.iml
+.idea/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/assetWizardSettings.xml
+.idea/gradle.xml
+.idea/dictionaries
+.idea/libraries
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services (only include if you're sharing the project)
+google-services.json
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Captures folder (screenshots and videos)
+captures/
+
+# External native build folders
+.externalNativeBuild/
+.cxx/

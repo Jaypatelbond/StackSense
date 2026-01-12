@@ -1,0 +1,16 @@
+
+// Since kotlinOptions inside android block is deprecated/erroring for jvmTarget,
+// we should configure it via the top-level kotlin extension usually, 
+// OR the error specifically said: "Using 'jvmTarget: String' is an error."
+// It means we can't assign string "17". We might be able to assign JvmTarget.JVM_17 if we cast or imported it?
+// However, standard fix is to use compilerOptions.
+// Let's add the kotlin block at the end of the file or use configuration.
+
+// Actually, wait. The replace above just removed jvmTarget line and added freeCompilerArgs?
+// I need to set jvmTarget!
+// If I remove it, it might default to 1.8. 
+// I should properly set it.
+
+// Let's use the kotlin extension block outside android block, or compilerOptions inside if supported.
+// Given strict kts, let's try appending the kotlin block.
+
