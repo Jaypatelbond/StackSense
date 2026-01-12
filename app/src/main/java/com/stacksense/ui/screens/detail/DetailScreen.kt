@@ -47,6 +47,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.stacksense.R
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -96,7 +98,7 @@ fun DetailScreen(
             MediumTopAppBar(
                 title = {
                     Text(
-                        text = uiState.appInfo?.appName ?: "App Details",
+                        text = uiState.appInfo?.appName ?: stringResource(R.string.app_details_title),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -105,7 +107,7 @@ fun DetailScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -117,7 +119,7 @@ fun DetailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Re-analyze",
+                            contentDescription = stringResource(R.string.reanalyze),
                             tint = if (uiState.isAnalyzing) 
                                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                             else 
@@ -135,7 +137,7 @@ fun DetailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Share,
-                            contentDescription = "Share"
+                            contentDescription = stringResource(R.string.share)
                         )
                     }
 
@@ -146,7 +148,7 @@ fun DetailScreen(
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
                                 imageVector = Icons.Outlined.MoreVert,
-                                contentDescription = "More options"
+                                contentDescription = stringResource(R.string.more_options)
                             )
                         }
                         
@@ -155,7 +157,7 @@ fun DetailScreen(
                             onDismissRequest = { showMenu = false }
                         ) {
                             androidx.compose.material3.DropdownMenuItem(
-                                text = { Text("Export Analysis (JSON)") },
+                                text = { Text(stringResource(R.string.export_json)) },
                                 onClick = {
                                     showMenu = false
                                     uiState.appInfo?.let { app ->
@@ -164,7 +166,7 @@ fun DetailScreen(
                                 }
                             )
                             androidx.compose.material3.DropdownMenuItem(
-                                text = { Text("Save APK") },
+                                text = { Text(stringResource(R.string.save_apk)) },
                                 onClick = {
                                     showMenu = false
                                     uiState.appInfo?.let { app ->
@@ -174,7 +176,7 @@ fun DetailScreen(
                             )
                             androidx.compose.material3.HorizontalDivider()
                             androidx.compose.material3.DropdownMenuItem(
-                                text = { Text("App Info") },
+                                text = { Text(stringResource(R.string.app_info)) },
                                 onClick = {
                                     showMenu = false
                                     uiState.appInfo?.let { app ->
@@ -244,7 +246,7 @@ private fun DetailContent(
         if (appInfo.isAnalyzed && librariesByCategory.isNotEmpty()) {
             item {
                 Text(
-                    text = "Libraries (${appInfo.libraries.size})",
+                    text = stringResource(R.string.libraries_count_fmt, appInfo.libraries.size),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -261,7 +263,7 @@ private fun DetailContent(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Library Distribution",
+                            text = stringResource(R.string.library_distribution),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -304,7 +306,7 @@ private fun DetailContent(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "No known libraries detected",
+                            text = stringResource(R.string.no_libraries),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -373,7 +375,7 @@ private fun AppHeader(appInfo: AppInfo) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Version ${appInfo.versionName}",
+                    text = stringResource(R.string.version_fmt, appInfo.versionName),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -401,7 +403,7 @@ private fun LanguagesSection(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Languages & Frameworks",
+                text = stringResource(R.string.languages_frameworks_title),
                 style = MaterialTheme.typography.titleSmall
             )
 
@@ -423,12 +425,12 @@ private fun LanguagesSection(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Scanning APK...",
+                            text = stringResource(R.string.scanning_apk),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Detecting languages, frameworks & libraries",
+                            text = stringResource(R.string.detecting_msg),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -445,7 +447,7 @@ private fun LanguagesSection(
                 }
             } else {
                 Text(
-                    text = "Tap refresh button to analyze",
+                    text = stringResource(R.string.tap_refresh_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -491,7 +493,7 @@ private fun PermissionsSection(permissions: List<String>) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Permissions (${permissions.size})",
+                text = stringResource(R.string.permissions_count_fmt, permissions.size),
                 style = MaterialTheme.typography.titleSmall
             )
 
@@ -528,17 +530,25 @@ private fun AppInfoSection(appInfo: AppInfo) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "App Information",
+                text = stringResource(R.string.app_information_title),
                 style = MaterialTheme.typography.titleSmall
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            InfoRow("APK Size", formatFileSize(appInfo.apkSize))
-            InfoRow("Version Code", appInfo.versionCode.toString())
-            InfoRow("System App", if (appInfo.isSystemApp) "Yes" else "No")
-            InfoRow("Installed", formatTimestamp(appInfo.installTime))
-            InfoRow("Updated", formatTimestamp(appInfo.updateTime))
+            InfoRow(stringResource(R.string.apk_size), formatFileSize(appInfo.apkSize))
+            InfoRow(stringResource(R.string.version_code), appInfo.versionCode.toString())
+            if (appInfo.minSdkVersion > 0) {
+                InfoRow(stringResource(R.string.min_sdk), "${appInfo.minSdkVersion}")
+            }
+            InfoRow(stringResource(R.string.target_sdk), "${appInfo.targetSdkVersion}")
+            InfoRow(stringResource(R.string.debuggable), if (appInfo.isDebuggable) stringResource(R.string.yes) else stringResource(R.string.no))
+            appInfo.installerPackageName?.let { installer ->
+                InfoRow(stringResource(R.string.installer), installer)
+            }
+            InfoRow(stringResource(R.string.is_system_app), if (appInfo.isSystemApp) stringResource(R.string.yes) else stringResource(R.string.no))
+            InfoRow(stringResource(R.string.installed_date), formatTimestamp(appInfo.installTime))
+            InfoRow(stringResource(R.string.updated_date), formatTimestamp(appInfo.updateTime))
         }
     }
 }

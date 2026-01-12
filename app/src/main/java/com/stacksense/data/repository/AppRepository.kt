@@ -53,6 +53,10 @@ class AppRepository @Inject constructor(
                             languages = parseLanguages(cached.languages),
                             libraries = parseLibraries(cached.libraries),
                             permissions = parsePermissions(cached.permissions),
+                            minSdkVersion = cached.minSdkVersion,
+                            targetSdkVersion = cached.targetSdkVersion,
+                            isDebuggable = cached.isDebuggable,
+                            installerPackageName = cached.installerPackageName,
                             isAnalyzed = true
                         )
                     } else {
@@ -78,6 +82,10 @@ class AppRepository @Inject constructor(
                         languages = parseLanguages(cached.languages),
                         libraries = parseLibraries(cached.libraries),
                         permissions = parsePermissions(cached.permissions),
+                        minSdkVersion = cached.minSdkVersion,
+                        targetSdkVersion = cached.targetSdkVersion,
+                        isDebuggable = cached.isDebuggable,
+                        installerPackageName = cached.installerPackageName,
                         isAnalyzed = true
                     )
                 } else {
@@ -138,6 +146,10 @@ class AppRepository @Inject constructor(
                         languages = parseLanguages(cached.languages),
                         libraries = parseLibraries(cached.libraries),
                         permissions = parsePermissions(cached.permissions),
+                        minSdkVersion = cached.minSdkVersion,
+                        targetSdkVersion = cached.targetSdkVersion,
+                        isDebuggable = cached.isDebuggable,
+                        installerPackageName = cached.installerPackageName,
                         isAnalyzed = true
                     )
                 } else {
@@ -228,6 +240,11 @@ class AppRepository @Inject constructor(
                 app.copy(
                     languages = parseLanguages(cached.languages),
                     libraries = parseLibraries(cached.libraries),
+                    permissions = parsePermissions(cached.permissions),
+                    minSdkVersion = cached.minSdkVersion,
+                    targetSdkVersion = cached.targetSdkVersion,
+                    isDebuggable = cached.isDebuggable,
+                    installerPackageName = cached.installerPackageName,
                     isAnalyzed = true
                 )
             } else {
@@ -257,6 +274,10 @@ class AppRepository @Inject constructor(
                 installTime = app.installTime,
                 updateTime = app.updateTime,
                 isSystemApp = app.isSystemApp,
+                minSdkVersion = app.minSdkVersion,
+                targetSdkVersion = app.targetSdkVersion,
+                isDebuggable = app.isDebuggable,
+                installerPackageName = app.installerPackageName,
                 languages = app.languages.joinToString("|||") { it.name },
                 libraries = app.libraries.joinToString("|||") { it.name },
                 permissions = app.permissions.joinToString("|||")
@@ -357,6 +378,17 @@ class AppRepository @Inject constructor(
                 installTime = packageInfo.firstInstallTime,
                 updateTime = packageInfo.lastUpdateTime,
                 isSystemApp = isSystemApp(applicationInfo),
+                minSdkVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) applicationInfo.minSdkVersion else 0,
+                targetSdkVersion = applicationInfo.targetSdkVersion,
+                isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0,
+                installerPackageName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    try {
+                        packageManager.getInstallSourceInfo(applicationInfo.packageName).installingPackageName
+                    } catch (e: Exception) { null }
+                } else {
+                    @Suppress("DEPRECATION")
+                    packageManager.getInstallerPackageName(applicationInfo.packageName)
+                },
                 permissions = packageInfo.requestedPermissions?.toList() ?: emptyList()
             )
         } catch (e: Exception) {

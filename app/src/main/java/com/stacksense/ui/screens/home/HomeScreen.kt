@@ -60,6 +60,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import com.stacksense.R 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -105,7 +107,7 @@ fun HomeScreen(
                 title = {
                     Column {
                         Text(
-                            text = "StackSense",
+                            text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.headlineMedium
                         )
                         AnimatedContent(
@@ -116,13 +118,13 @@ fun HomeScreen(
                             if (!isLoading) {
                                 val analyzedCount = uiState.apps.count { it.isAnalyzed }
                                 Text(
-                                    text = "${uiState.apps.size} apps • $analyzedCount analyzed",
+                                    text = stringResource(R.string.apps_analyzed_fmt, uiState.apps.size, analyzedCount),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             } else {
                                 Text(
-                                    text = "Loading...",
+                                    text = stringResource(R.string.loading),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -134,7 +136,7 @@ fun HomeScreen(
                     IconButton(onClick = { showMenu = true }) {
                         Icon(
                             imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "More options"
+                            contentDescription = stringResource(R.string.more_options)
                         )
                     }
                     DropdownMenu(
@@ -142,7 +144,7 @@ fun HomeScreen(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Force Rescan All") },
+                            text = { Text(stringResource(R.string.force_rescan)) },
                             onClick = {
                                 showMenu = false
                                 viewModel.forceRescan()
@@ -152,7 +154,7 @@ fun HomeScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Settings") },
+                            text = { Text(stringResource(R.string.settings)) },
                             onClick = {
                                 showMenu = false
                                 onNavigateToSettings()
@@ -191,7 +193,7 @@ fun HomeScreen(
                 },
                 text = {
                     Text(
-                        text = if (uiState.isScanning) "Scanning..." else "Scan Apps"
+                        text = if (uiState.isScanning) stringResource(R.string.scanning) else stringResource(R.string.scan_apps)
                     )
                 },
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -272,7 +274,7 @@ private fun SearchSection(
             modifier = Modifier.fillMaxWidth(),
             placeholder = { 
                 Text(
-                    "Search apps...",
+                    stringResource(R.string.search_hint),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ) 
             },
@@ -346,7 +348,7 @@ private fun ScanProgressCard(progress: com.stacksense.data.model.ScanProgress) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Analyzing apps...",
+                        text = stringResource(R.string.analyzing_apps),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -399,7 +401,7 @@ private fun LoadingContent() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Loading installed apps...",
+                text = stringResource(R.string.loading_installed_apps),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -437,17 +439,17 @@ private fun EmptyContent(
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = when {
-                    !hasApps -> "Unable to access installed apps"
-                    searchQuery.isNotEmpty() -> "No apps match \"$searchQuery\""
-                    else -> "No apps match your filters"
+                    !hasApps -> stringResource(R.string.unable_to_access_apps)
+                    searchQuery.isNotEmpty() -> stringResource(R.string.no_apps_match_query, searchQuery)
+                    else -> stringResource(R.string.no_apps_match_filters)
                 },
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = if (hasApps) "Try a different search term or adjusted filters"
-                else "Please check permissions",
+                text = if (hasApps) stringResource(R.string.try_different_search)
+                else stringResource(R.string.check_permissions),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

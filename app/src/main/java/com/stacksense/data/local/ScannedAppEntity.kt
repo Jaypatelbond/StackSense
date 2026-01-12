@@ -22,6 +22,10 @@ data class ScannedAppEntity(
     val installTime: Long,
     val updateTime: Long,
     val isSystemApp: Boolean,
+    val minSdkVersion: Int = 0,
+    val targetSdkVersion: Int = 0,
+    val isDebuggable: Boolean = false,
+    val installerPackageName: String? = null,
     val languages: String, // JSON array of language names
     val libraries: String, // JSON array of library names
     val permissions: String, // JSON array of permission names

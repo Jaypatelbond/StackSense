@@ -36,6 +36,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.stacksense.R
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -69,12 +71,12 @@ fun SettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -89,23 +91,23 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             // Appearance Section
-            SettingsSectionHeader(title = "Appearance")
+            SettingsSectionHeader(title = stringResource(R.string.appearance_header))
             
             SettingsItem(
-                title = "App theme",
+                title = stringResource(R.string.app_theme_title),
                 subtitle = when (preferences?.darkThemeConfig) {
-                    DarkThemeConfig.FOLLOW_SYSTEM -> "System default"
-                    DarkThemeConfig.LIGHT -> "Light"
-                    DarkThemeConfig.DARK -> "Dark"
-                    null -> "Loading..."
+                    DarkThemeConfig.FOLLOW_SYSTEM -> stringResource(R.string.theme_system)
+                    DarkThemeConfig.LIGHT -> stringResource(R.string.theme_light)
+                    DarkThemeConfig.DARK -> stringResource(R.string.theme_dark)
+                    null -> stringResource(R.string.loading)
                 },
                 onClick = { showThemeDialog = true }
             )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SettingsSwitchItem(
-                    title = "Dynamic color",
-                    subtitle = "Use colors from your wallpaper",
+                    title = stringResource(R.string.dynamic_color_title),
+                    subtitle = stringResource(R.string.dynamic_color_subtitle),
                     checked = preferences?.useDynamicColors ?: true,
                     onCheckedChange = { viewModel.updateDynamicColorPreference(it) }
                 )
@@ -114,11 +116,11 @@ fun SettingsScreen(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             // General Section
-            SettingsSectionHeader(title = "General")
+            SettingsSectionHeader(title = stringResource(R.string.general_header))
 
             SettingsSwitchItem(
-                title = "Show system apps",
-                subtitle = "Include pre-installed system applications in scan",
+                title = stringResource(R.string.show_system_apps_title),
+                subtitle = stringResource(R.string.show_system_apps_subtitle),
                 checked = preferences?.showSystemApps ?: false,
                 onCheckedChange = { viewModel.updateShowSystemApps(it) }
             )
@@ -208,21 +210,21 @@ fun ThemeDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Choose theme") },
+        title = { Text(stringResource(R.string.choose_theme_dialog)) },
         text = {
             Column(modifier = Modifier.selectableGroup()) {
                 ThemeRadioOption(
-                    title = "System default",
+                    title = stringResource(R.string.theme_system),
                     selected = currentConfig == DarkThemeConfig.FOLLOW_SYSTEM,
                     onClick = { onSelectInfo(DarkThemeConfig.FOLLOW_SYSTEM) }
                 )
                 ThemeRadioOption(
-                    title = "Light",
+                    title = stringResource(R.string.theme_light),
                     selected = currentConfig == DarkThemeConfig.LIGHT,
                     onClick = { onSelectInfo(DarkThemeConfig.LIGHT) }
                 )
                 ThemeRadioOption(
-                    title = "Dark",
+                    title = stringResource(R.string.theme_dark),
                     selected = currentConfig == DarkThemeConfig.DARK,
                     onClick = { onSelectInfo(DarkThemeConfig.DARK) }
                 )
@@ -230,7 +232,7 @@ fun ThemeDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
