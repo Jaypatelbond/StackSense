@@ -90,7 +90,7 @@ class ApkAnalyzer @Inject constructor() {
             // Thread-safe collections for parallel processing
             val detectedLibraries = java.util.Collections.synchronizedList(mutableListOf<LibraryInfo>())
             // Use ConcurrentHashMap to allow safe removal during iteration
-            val remainingSignatures = java.util.concurrent.ConcurrentHashMap(LibrarySignatures.SIGNATURES)
+            val remainingSignatures = java.util.concurrent.ConcurrentHashMap(LibrarySignatures.DEX_PATTERNS)
 
             try {
                 val apkFile = File(apkPath)
@@ -122,16 +122,11 @@ class ApkAnalyzer @Inject constructor() {
                                     // bufferedReader handles encoding efficiently.
                                     val content = zip.getInputStream(dexEntry).bufferedReader(Charsets.ISO_8859_1).readText()
 
-                                    // Iterate through remaining signatures
-                                    // We use an iterator to safely remove found signatures
                                     val iterator = remainingSignatures.iterator()
                                     while (iterator.hasNext()) {
                                         val entry = iterator.next()
-                                        val prefix = entry.key
+                                        val dexPattern = entry.key
                                         val libraryInfo = entry.value
-
-                                        // Convert package prefix to DEX format: com.package -> Lcom/package/
-                                        val dexPattern = "L${prefix.replace(".", "/")}/"
 
                                         if (content.contains(dexPattern)) {
                                             detectedLibraries.add(libraryInfo)
