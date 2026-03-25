@@ -1163,4 +1163,13 @@ object LibrarySignatures {
             website = "https://netcorecloud.com/"
         )
     )
+
+    /**
+     * Precomputed DEX patterns for faster searching without string replacement overhead.
+     */
+    val DEX_PATTERNS: Map<String, LibraryInfo> by lazy {
+        SIGNATURES.mapKeys { (prefix, _) ->
+            "L${prefix.replace(".", "/")}/"
+        }
+    }
 }
