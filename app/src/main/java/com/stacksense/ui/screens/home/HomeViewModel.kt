@@ -271,10 +271,13 @@ class HomeViewModel @Inject constructor(
         query: String,
         filters: Set<FilterType>
     ): List<AppInfo> {
+        val ignoreCaseQuery = query.trim()
+        val isQueryEmpty = ignoreCaseQuery.isEmpty()
+
         return apps.filter { app ->
-            val matchesQuery = query.isEmpty() ||
-                    app.appName.contains(query, ignoreCase = true) ||
-                    app.packageName.contains(query, ignoreCase = true)
+            val matchesQuery = isQueryEmpty ||
+                    app.appName.contains(ignoreCaseQuery, ignoreCase = true) ||
+                    app.packageName.contains(ignoreCaseQuery, ignoreCase = true)
 
             val matchesFilter = if (filters.contains(FilterType.ALL)) {
                 true
