@@ -110,7 +110,7 @@ class AppRepository @Inject constructor(
             packageManager.getInstalledApplications(flags)
                 .filter { includeSystemApps || !isSystemApp(it) }
                 .mapNotNull { appInfo -> createAppInfo(appInfo) }
-                .sortedBy { it.appName.lowercase() }
+                .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.appName })
         } catch (e: Exception) {
             Log.e(TAG, "Error getting installed apps", e)
             emptyList()
