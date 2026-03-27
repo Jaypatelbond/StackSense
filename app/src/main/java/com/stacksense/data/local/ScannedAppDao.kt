@@ -39,6 +39,7 @@ interface ScannedAppDao {
     /**
      * Insert or update multiple scanned apps.
      */
+    @androidx.room.Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateAll(apps: List<ScannedAppEntity>)
     
