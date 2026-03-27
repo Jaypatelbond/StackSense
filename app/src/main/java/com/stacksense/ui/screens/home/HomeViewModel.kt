@@ -11,6 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,34 +59,23 @@ class HomeViewModel @Inject constructor(
         // Observe user preferences and switch upstream flow accordingly
         viewModelScope.launch {
             userPreferencesRepository.userPreferencesFlow
-                .collect { prefs ->
-                    // Update state with new preference
-                    _uiState.update { it.copy(includeSystemApps = prefs.showSystemApps) }
+                .flatMapLatest { prefs ->
+                    // Update state with new preference and set loading
+                    _uiState.update { it.copy(
+                        includeSystemApps = prefs.showSystemApps,
+                        isLoading = true,
+                        error = null
+                    ) }
                     
-                    // Start observing apps depending on system apps setting
-                    // Note: We're doing this inside the collect, which effectively restarts observation 
-                    // when prefs change. For a cleaner approach we could use flatMapLatest, 
-                    // but simple collection cancel/restart works since the outer scope is the same.
-                    observeApps(prefs.showSystemApps)
+                    // Switch to the apps flow based on the new preference
+                    appRepository.getInstalledAppsFlow(prefs.showSystemApps)
                 }
-        }
-    }
-    
-    private var appJob: kotlinx.coroutines.Job? = null
-
-    /**
-     * Observes the list of installed apps from the repository.
-     * Updates automatically when DB changes (e.g., after analysis).
-     */
-    private fun observeApps(includeSystemApps: Boolean) {
-        // Cancel previous observation if any
-        appJob?.cancel()
-        
-        appJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            
-            try {
-                appRepository.getInstalledAppsFlow(includeSystemApps).collect { apps ->
+                .catch { e ->
+                    _uiState.update { 
+                        it.copy(isLoading = false, error = "Failed to load apps: ${e.message}") 
+                    }
+                }
+                .collect { apps ->
                     val cachedCount = apps.count { it.isAnalyzed }
                     
                     _uiState.update { state ->
@@ -96,11 +87,6 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
-            } catch (e: Exception) {
-                _uiState.update { 
-                    it.copy(isLoading = false, error = "Failed to load apps: ${e.message}") 
-                }
-            }
         }
     }
 
