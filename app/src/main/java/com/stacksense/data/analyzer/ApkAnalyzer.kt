@@ -110,10 +110,8 @@ class ApkAnalyzer @Inject constructor() {
                     val dexEntries = entries.filter { it.name.endsWith(".dex") }
 
                     // Process DEX files in parallel
-                    // Use Default dispatcher for CPU-intensive string searching
-                    // Process DEX files in parallel
-                    // Use Default dispatcher for CPU-intensive string searching
-                    withContext(Dispatchers.Default) {
+                    // Use Default dispatcher for CPU-intensive string searching but limit parallelism to avoid OOM
+                    withContext(Dispatchers.Default.limitedParallelism(4)) {
                         dexEntries.map { dexEntry ->
                             async {
                                 try {
@@ -166,6 +164,11 @@ class ApkAnalyzer @Inject constructor() {
         var hasKmp = false
 
         for (name in entryNames) {
+            // Early break if all possible languages/frameworks detected
+            if (hasKotlin && hasNative && hasFlutter && hasReactNative && hasXamarin && hasCordova && hasUnity && hasQt && hasKmp) {
+                break
+            }
+
             // Check for Kotlin
             if (!hasKotlin && (name.startsWith("kotlin/") || name.contains("kotlin/Metadata"))) {
                 hasKotlin = true
