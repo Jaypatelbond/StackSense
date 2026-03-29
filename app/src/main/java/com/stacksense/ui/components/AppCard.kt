@@ -51,7 +51,7 @@ import com.stacksense.data.model.Language
 @Composable
 fun AppCard(
     appInfo: AppInfo,
-    onClick: () -> Unit,
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scale by animateFloatAsState(
@@ -64,7 +64,7 @@ fun AppCard(
     )
 
     Card(
-        onClick = onClick,
+        onClick = { onClick(appInfo.packageName) },
         modifier = modifier
             .fillMaxWidth()
             .scale(scale),

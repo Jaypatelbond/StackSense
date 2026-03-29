@@ -306,7 +306,10 @@ private fun FilterChipsRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(FilterType.entries) { filter ->
+        items(
+            items = FilterType.entries.toTypedArray(),
+            key = { it.name }
+        ) { filter ->
             val isSelected = selectedFilters.contains(filter)
             FilterChip(
                 selected = isSelected,
@@ -483,7 +486,7 @@ private fun AppList(
             ) {
                 AppCard(
                     appInfo = app,
-                    onClick = { onAppClick(app.packageName) }
+                    onClick = onAppClick
                 )
             }
         }
