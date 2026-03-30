@@ -107,10 +107,14 @@ class AppRepository @Inject constructor(
         }
 
         return try {
-            packageManager.getInstalledApplications(flags)
-                .filter { includeSystemApps || !isSystemApp(it) }
-                .mapNotNull { appInfo -> createAppInfo(appInfo) }
-                .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.appName })
+            val apps = packageManager.getInstalledApplications(flags)
+            val result = java.util.ArrayList<AppInfo>(apps.size)
+            for (app in apps) {
+                if (includeSystemApps || !isSystemApp(app)) {
+                    createAppInfo(app)?.let { result.add(it) }
+                }
+            }
+            result.apply { sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.appName }) }
         } catch (e: Exception) {
             Log.e(TAG, "Error getting installed apps", e)
             emptyList()
