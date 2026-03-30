@@ -46,7 +46,7 @@ class AppRepository @Inject constructor(
                 val cachedMap = cachedList.associateBy { it.packageName }
                 val installedApps = getInstalledApps(includeSystemApps)
                 
-                installedApps.map { app ->
+                installedApps.asSequence().map { app ->
                     val cached = cachedMap[app.packageName]
                     if (cached != null && cached.isValid(app.updateTime)) {
                         app.copy(
@@ -62,7 +62,7 @@ class AppRepository @Inject constructor(
                     } else {
                         app
                     }
-                }
+                }.toList()
             }
             .flowOn(Dispatchers.IO)
 
@@ -74,7 +74,7 @@ class AppRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             val cachedApps = scannedAppDao.getAllScannedAppsOnce().associateBy { it.packageName }
 
-            getInstalledApps(includeSystemApps).map { app ->
+            getInstalledApps(includeSystemApps).asSequence().map { app ->
                 val cached = cachedApps[app.packageName]
                 if (cached != null && cached.isValid(app.updateTime)) {
                     // Use cached analysis results
@@ -91,7 +91,7 @@ class AppRepository @Inject constructor(
                 } else {
                     app
                 }
-            }
+            }.toList()
         }
 
     /**
