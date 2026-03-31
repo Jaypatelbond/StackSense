@@ -76,6 +76,9 @@ class ApkAnalyzer @Inject constructor() {
             "kotlinx-coroutines-core-native",
             "kotlin-native"
         )
+        
+        // Use a dedicated dispatcher for heavy parsing to avoid OOM
+        private val APK_PARSING_DISPATCHER = Dispatchers.Default.limitedParallelism(4)
     }
 
     /**
@@ -110,8 +113,8 @@ class ApkAnalyzer @Inject constructor() {
                     val dexEntries = entries.filter { it.name.endsWith(".dex") }
 
                     // Process DEX files in parallel
-                    // Use Default dispatcher for CPU-intensive string searching but limit parallelism to avoid OOM
-                    withContext(Dispatchers.Default.limitedParallelism(4)) {
+                    // Use dedicated dispatcher for CPU-intensive string searching but limit parallelism to avoid OOM
+                    withContext(APK_PARSING_DISPATCHER) {
                         dexEntries.map { dexEntry ->
                             async {
                                 try {
