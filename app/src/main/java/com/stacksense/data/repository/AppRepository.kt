@@ -132,17 +132,12 @@ class AppRepository @Inject constructor(
             var scanned = 0
 
             for (app in apps) {
-                val progress = ScanProgress(
-                    totalApps = totalApps,
-                    scannedApps = scanned,
-                    currentAppName = app.appName
-                )
-                emit(Pair(progress, null))
-
                 val cached = cachedApps[app.packageName]
-                val analyzedApp = if (cached != null && cached.isValid(app.updateTime)) {
+                if (cached != null && cached.isValid(app.updateTime)) {
                     // Use cached result - instant
-                    app.copy(
+                    scanned++
+                    val progress = ScanProgress(totalApps, scanned, app.appName)
+                    val analyzedApp = app.copy(
                         languages = parseLanguages(cached.languages),
                         libraries = parseLibraries(cached.libraries),
                         permissions = parsePermissions(cached.permissions),
@@ -152,17 +147,21 @@ class AppRepository @Inject constructor(
                         installerPackageName = cached.installerPackageName,
                         isAnalyzed = true
                     )
-                } else {
-                    // Need to analyze - takes time
-                    val freshAnalysis = analyzeApp(app)
-                    // Cache the result
-                    cacheAppAnalysis(freshAnalysis)
-                    freshAnalysis
+                    emit(Pair(progress, analyzedApp))
+                    continue
                 }
+
+                // Need to analyze - takes time so emit current progress
+                val progress = ScanProgress(totalApps, scanned, app.appName)
+                emit(Pair(progress, null))
+                
+                val freshAnalysis = analyzeApp(app)
+                // Cache the result
+                cacheAppAnalysis(freshAnalysis)
 
                 scanned++
                 val updatedProgress = progress.copy(scannedApps = scanned)
-                emit(Pair(updatedProgress, analyzedApp))
+                emit(Pair(updatedProgress, freshAnalysis))
             }
 
             // Clean up uninstalled apps from cache
