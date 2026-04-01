@@ -4,10 +4,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-/**
- * Room database for StackSense app.
- * Caches scanned app data to avoid re-scanning on every launch.
- */
 @Database(
     entities = [ScannedAppEntity::class],
     version = 3,
@@ -16,6 +12,7 @@ import androidx.room.TypeConverters
 @TypeConverters(Converters::class)
 abstract class StackSenseDatabase : RoomDatabase() {
     abstract fun scannedAppDao(): ScannedAppDao
+    abstract fun statsDao(): StatsDao
     
     companion object {
         const val DATABASE_NAME = "stacksense_db"

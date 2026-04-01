@@ -5,7 +5,10 @@ import android.content.pm.PackageManager
 import androidx.room.Room
 import com.stacksense.data.analyzer.ApkAnalyzer
 import com.stacksense.data.local.ScannedAppDao
+import com.stacksense.data.local.StatsDao
 import com.stacksense.data.local.StackSenseDatabase
+import com.stacksense.data.repository.AppRepository
+import com.stacksense.data.repository.StatsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,9 +16,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/**
- * Hilt module providing application-level dependencies.
- */
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -48,5 +48,17 @@ object AppModule {
     @Singleton
     fun provideScannedAppDao(database: StackSenseDatabase): ScannedAppDao {
         return database.scannedAppDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideStatsDao(database: StackSenseDatabase): StatsDao {
+        return database.statsDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideStatsRepository(statsDao: StatsDao): StatsRepository {
+        return StatsRepository(statsDao)
     }
 }
