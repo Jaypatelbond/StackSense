@@ -1,62 +1,44 @@
 package com.stacksense.ui.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.runtime.Composable
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.stacksense.ui.screens.detail.DetailScreen
 import com.stacksense.ui.screens.home.HomeScreen
 import com.stacksense.ui.screens.settings.SettingsScreen
+import com.stacksense.ui.screens.stats.StatsScreen
 
-/**
- * Navigation routes for the app.
- */
 object Routes {
-    const val HOME = "home"
+    const val MAIN = "main"
     const val SETTINGS = "settings"
     const val DETAIL = "detail/{packageName}"
+    
+    const val HOME = "home"
+    const val STATS = "stats"
 
-    fun detailRoute(packageName: String): String {
-        return "detail/$packageName"
-    }
+    fun detailRoute(packageName: String): String = "detail/$packageName"
 }
 
-/**
- * Main navigation graph for StackSense.
- */
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME
+        startDestination = Routes.MAIN
     ) {
-        // Home Screen
-        composable(
-            route = Routes.HOME,
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
-                ) + fadeOut()
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
-                ) + fadeIn()
-            }
-        ) {
-            HomeScreen(
+        composable(route = Routes.MAIN) {
+            MainScreen(
                 onAppClick = { packageName ->
                     navController.navigate(Routes.detailRoute(packageName))
                 },
@@ -66,53 +48,54 @@ fun AppNavigation(
             )
         }
 
-        // Detail Screen
         composable(
             route = Routes.DETAIL,
-            arguments = listOf(
-                navArgument("packageName") { type = NavType.StringType }
-            ),
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
-                ) + fadeIn()
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
-                ) + fadeOut()
-            }
+            arguments = listOf(navArgument("packageName") { type = NavType.StringType })
         ) {
-            DetailScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
+            DetailScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        // Settings Screen
-        composable(
-            route = Routes.SETTINGS,
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
-                ) + fadeIn()
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium)
-                ) + fadeOut()
+        composable(route = Routes.SETTINGS) {
+            SettingsScreen(onNavigateBack = { navController.popBackStack() })
+        }
+    }
+}
+
+@Composable
+fun MainScreen(
+    onAppClick: (String) -> Unit,
+    onNavigateToSettings: () -> Unit
+) {
+    var selectedTab by remember { mutableStateOf(0) }
+    
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    icon = { Icon(Icons.Default.BarChart, contentDescription = "Stats") },
+                    label = { Text("Stats") }
+                )
             }
-        ) {
-            SettingsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
+        }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            Crossfade(targetState = selectedTab, label = "tabTransition") { tab ->
+                when (tab) {
+                    0 -> HomeScreen(
+                        onAppClick = onAppClick,
+                        onNavigateToSettings = onNavigateToSettings
+                    )
+                    1 -> StatsScreen()
                 }
-            )
+            }
         }
     }
 }
