@@ -5,6 +5,7 @@ import com.stacksense.data.model.*
 import com.stacksense.data.analyzer.LibrarySignatures
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,6 +13,7 @@ import javax.inject.Singleton
 class StatsRepository @Inject constructor(
     private val statsDao: StatsDao
 ) {
+    private val statsCache = ConcurrentHashMap<String, OverallStats>()
     fun getOverallStats(): Flow<OverallStats> {
         return combine(
             statsDao.getTotalAnalyzedCount(),
@@ -29,6 +31,8 @@ class StatsRepository @Inject constructor(
         libraryStrings: List<String>,
         permissionStrings: List<String>
     ): OverallStats {
+        val cacheKey = "${totalAnalyzed}_${languageStrings.hashCode()}_${libraryStrings.hashCode()}_${permissionStrings.hashCode()}"
+        statsCache[cacheKey]?.let { return it }
         val languageCounts = mutableMapOf<Language, Int>()
         languageStrings.forEach { langStr ->
             langStr.split("|||").filter { it.isNotBlank() }.forEach { name ->
@@ -84,7 +88,7 @@ class StatsRepository @Inject constructor(
         val avgLibs = if (totalAnalyzed > 0) libraryStrings.sumOf { it.split("|||").count { l -> l.isNotBlank() } }.toFloat() / totalAnalyzed else 0f
         val avgPerms = if (totalAnalyzed > 0) totalPermissions.toFloat() / totalAnalyzed else 0f
 
-        return OverallStats(
+        val overallResult = OverallStats(
             totalApps = totalAnalyzed,
             analyzedApps = totalAnalyzed,
             totalLibraries = libraryCounts.size,
@@ -97,5 +101,7 @@ class StatsRepository @Inject constructor(
             topLibraries = topLibraries,
             categoryDistribution = categoryDistribution
         )
+        statsCache[cacheKey] = overallResult
+        return overallResult
     }
 }
