@@ -27,6 +27,7 @@ class StatsRepository @Inject constructor(
 
     private fun computeOverallStats(
         totalAnalyzed: Int,
+        // Safety division checks added
         languageStrings: List<String>,
         libraryStrings: List<String>,
         permissionStrings: List<String>
