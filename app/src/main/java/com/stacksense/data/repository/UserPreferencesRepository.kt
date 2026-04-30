@@ -78,4 +78,15 @@ class UserPreferencesRepository @Inject constructor(
             preferences[PreferencesKeys.SHOW_SYSTEM_APPS] = showSystemApps
         }
     }
+
+    private object PreferencesKeysOnboarding {
+        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+    }
+
+    suspend fun setOnboardingCompleted(completed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeysOnboarding.ONBOARDING_COMPLETED] = completed
+        }
+    }
+
 }
