@@ -4,11 +4,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.room.Room
 import com.stacksense.data.analyzer.ApkAnalyzer
-import com.stacksense.data.local.ScannedAppDao
-import com.stacksense.data.local.StatsDao
-import com.stacksense.data.local.StackSenseDatabase
-import com.stacksense.data.repository.AppRepository
-import com.stacksense.data.repository.StatsRepository
+import com.stacksense.data.local.*
+import com.stacksense.data.repository.*
+import com.stacksense.data.export.BatchExportManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,5 +58,29 @@ object AppModule {
     @Singleton
     fun provideStatsRepository(statsDao: StatsDao): StatsRepository {
         return StatsRepository(statsDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteDao(database: StackSenseDatabase): FavoriteDao {
+        return database.favoriteDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCollectionDao(database: StackSenseDatabase): CollectionDao {
+        return database.collectionDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoritesRepository(favoriteDao: FavoriteDao): FavoritesRepository {
+        return FavoritesRepository(favoriteDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBatchExportManager(): BatchExportManager {
+        return BatchExportManager()
     }
 }
