@@ -115,6 +115,11 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    // Glance & WorkManager dependencies
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
 }
 
 kotlin {
