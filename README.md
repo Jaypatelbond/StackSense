@@ -245,3 +245,6 @@ Made with ❤️ using Kotlin & Jetpack Compose
 **If you found this project helpful, please ⭐ the repository!**
 
 </div>
+
+## StackSense 2.0.0 Release
+Now supports statistics dashboard screen, app comparison matrixes, batch reports exporting, advanced query searches, favorites database bookmarks, permission scoring algorithms, Glance home widget widget updates, and quick shortcuts action keys.
