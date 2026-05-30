@@ -22,3 +22,6 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+# Proguard configurations for Glance & WorkManager
+-keep class androidx.glance.** { *; }
