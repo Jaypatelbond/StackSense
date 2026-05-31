@@ -32,6 +32,9 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -85,12 +88,15 @@ fun HomeScreen(
     userData: List<AppInfo> = emptyList(), // Default for preview/safety
     onAppClick: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToCompare: (List<String>) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     var showMenu by remember { mutableStateOf(false) }
+    var isComparisonMode by remember { mutableStateOf(false) }
+    val selectedPackages = remember { mutableStateListOf<String>() }
 
     // Show error snackbar
     LaunchedEffect(uiState.error) {
@@ -107,62 +113,106 @@ fun HomeScreen(
                 title = {
                     Column {
                         Text(
-                            text = stringResource(R.string.app_name),
+                            text = if (isComparisonMode) "Compare Apps" else stringResource(R.string.app_name),
                             style = MaterialTheme.typography.headlineMedium
                         )
-                        AnimatedContent(
-                            targetState = uiState.isLoading,
-                            transitionSpec = { fadeIn() togetherWith fadeOut() },
-                            label = "subtitle"
-                        ) { isLoading ->
-                            if (!isLoading) {
-                                val analyzedCount = uiState.apps.count { it.isAnalyzed }
-                                Text(
-                                    text = stringResource(R.string.apps_analyzed_fmt, uiState.apps.size, analyzedCount),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            } else {
-                                Text(
-                                    text = stringResource(R.string.loading),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        if (isComparisonMode) {
+                            Text(
+                                text = "Selected: ${selectedPackages.size}/3",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            AnimatedContent(
+                                targetState = uiState.isLoading,
+                                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                                label = "subtitle"
+                            ) { isLoading ->
+                                if (!isLoading) {
+                                    val analyzedCount = uiState.apps.count { it.isAnalyzed }
+                                    Text(
+                                        text = stringResource(R.string.apps_analyzed_fmt, uiState.apps.size, analyzedCount),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                } else {
+                                    Text(
+                                        text = stringResource(R.string.loading),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         }
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = stringResource(R.string.more_options)
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.force_rescan)) },
+                    if (isComparisonMode) {
+                        IconButton(
                             onClick = {
-                                showMenu = false
-                                viewModel.forceRescan()
+                                if (selectedPackages.size >= 2) {
+                                    onNavigateToCompare(selectedPackages.toList())
+                                    isComparisonMode = false
+                                    selectedPackages.clear()
+                                }
                             },
-                            leadingIcon = {
-                                Icon(Icons.Default.Refresh, contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.settings)) },
+                            enabled = selectedPackages.size >= 2
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Confirm comparison",
+                                tint = if (selectedPackages.size >= 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            )
+                        }
+                        IconButton(
                             onClick = {
-                                showMenu = false
-                                onNavigateToSettings()
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Outlined.Settings, contentDescription = null)
+                                isComparisonMode = false
+                                selectedPackages.clear()
                             }
-                        )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Cancel comparison"
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = { isComparisonMode = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh, // We use Refresh icon or another available icon for starting comparison mode
+                                contentDescription = "Compare apps"
+                            )
+                        }
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Outlined.MoreVert,
+                                contentDescription = stringResource(R.string.more_options)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.force_rescan)) },
+                                onClick = {
+                                    showMenu = false
+                                    viewModel.forceRescan()
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Refresh, contentDescription = null)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings)) },
+                                onClick = {
+                                    showMenu = false
+                                    onNavigateToSettings()
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Outlined.Settings, contentDescription = null)
+                                }
+                            )
+                        }
                     }
                 },
                 scrollBehavior = scrollBehavior,

@@ -52,7 +52,8 @@ import com.stacksense.data.model.Language
 fun AppCard(
     appInfo: AppInfo,
     onClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selected: Boolean = false
 ) {
     val scale by animateFloatAsState(
         targetValue = 1f,
@@ -70,8 +71,17 @@ fun AppCard(
             .scale(scale),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            containerColor = if (selected) {
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f)
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            }
         ),
+        border = if (selected) {
+            androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+        } else {
+            null
+        },
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(

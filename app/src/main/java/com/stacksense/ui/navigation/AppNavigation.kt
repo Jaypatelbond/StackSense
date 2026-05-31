@@ -150,7 +150,8 @@ fun MainScreen(
                 when (tab) {
                     0 -> HomeScreen(
                         onAppClick = onAppClick,
-                        onNavigateToSettings = onNavigateToSettings
+                        onNavigateToSettings = onNavigateToSettings,
+                        onNavigateToCompare = onNavigateToCompare
                     )
                     1 -> StatsScreen()
                     2 -> FavoritesScreen(onAppClick = onAppClick)
